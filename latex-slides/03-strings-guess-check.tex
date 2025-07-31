@@ -1,0 +1,383 @@
+%-----------------------------------------------------------------
+% Rodrigo Chang, 2019
+% Banco de Guatemala
+% Programa de Estudios Superiores 2019-2020
+% Diapositivas del curso "Programación I"
+%
+% Descargo de responsabilidad.
+%   El contenido de este documento es responsabilidad exclusiva de
+% su(s) autores. Cualquier opinión expresada no necesariamente
+% representa la postura institucional del Banco de Guatemala. 
+% 
+% Contenido.
+%   El contenido de estas diapositivas está construido a partir de 
+% modificaciones al material provisto por Ana Bell, Eric Grimson y 
+% John Guttag para el curso 6.0001 Introduction to Computer Science 
+% and Programming in Python, otoño 2016, Massachusetts Institute of 
+% Technology: MIT OpenCourseWare, https://ocw.mit.edu
+%
+% Licencia: 
+% Creative Commons BY-NC-SA
+% https://creativecommons.org/licenses/by-nc-sa/4.0/.
+%
+% Formato. 
+%   El formato utilizado para la elaboración de este documento 
+% ha sido modificado a partir del repositorio: 
+%       https://github.com/rinnert/statlearning-python-pwf
+%
+% Kurt Rinnert, 2019
+%   Copying and distribution of this file, with or without 
+% modification, are permitted in any medium without royalty provided 
+% the copyright notice and this notice are preserved. This file is 
+% offered as-is, without any warranty.
+%
+%-----------------------------------------------------------------
+\documentclass[mathserif]{beamer}
+% Para configurar las diapositivas en relación 16:9, 
+% agregar la opción aspectratio=169
+
+% Título de la presentación y tópicos a tratar
+\input{preamble}
+\subtitle{\bfseries%
+  {Manejo de strings, \textit{guess and check}, métodos de aproximación}\\%
+  %{\tiny\it Manejo de strings, \textit{guess and check}, métodos de aproximación}\\%
+}
+
+% Inicio del documento
+\begin{document}
+\input{common}
+%-----------------------------------------------------------------
+% Empieza el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{frame}{Abstract}
+	\Quote{Everybody should learn to program a computer, because it teaches you how to think}{Steve Jobs}
+    
+	\begin{blurb}
+		Veremos un poco más acerca de la manipulación de cadenas de texto. 
+		
+		Hablaremos de los algoritmos \textit{guess and check}. 
+		
+		Conoceremos algunas aplicaciones de este tipo de algoritmos.
+	\end{blurb}
+\end{frame}
+
+\section{Manipulación de cadenas de texto}
+
+\begin{frame}[fragile]{Cadenas de texto}
+    \begin{itemize}
+        \item Tipo de datos {\blue no escalar} en Python. 
+        
+        \item Algunos operadores curiosos definidos: \lstinline|>, <, ==|.
+        
+        \item Podemos utilizar la función \lstinline|len()| para obtener el largo de la cadena.
+\begin{lstlisting}
+s = "abcde"
+len(s) # devuelve 3
+\end{lstlisting}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Cadenas de texto}
+    \begin{itemize}
+        \item Los objetos de tipo \lstinline|str| poseen estructura. Esto nos permite {\blue\bfseries indexar} los caracteres que la conforman.
+\begin{lstlisting}
+s[0]  # -> devuelve "a"
+s[1]  # -> devuelve "b"
+s[2]  # -> devuelve "c"
+s[3]  # -> fuera de límites, error
+s[-1] # -> devuelve "c"
+s[-2] # -> devuelve "b"
+s[-3] # -> devuelve "a"
+\end{lstlisting}
+        
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\textit{Slicing}}
+    \begin{itemize}
+        \item Las cadenas se pueden ``partir'' utilizando \lstinline|[start:stop:step]|. 
+        
+        \item Si \lstinline|[start:stop]|, \lstinline|step = 1| por defecto.
+        
+        \item Se pueden {\blue omitir} números y dejar \lstinline|:|
+    \end{itemize}
+    
+\begin{lstlisting}
+s = "abcdefgh"
+s[3:6]   # -> devuelve "def", s[3:6:1]
+s[3:6:2] # -> devuelve "df"
+s[::]    # -> devuelve "abcdefgh", s[0:len(s):1]
+s[::-1]  # -> devuelve "hgfedbca", s[-1:-(len(s)+1):-1]
+s[4:1:-2]# -> devuelve "ec"
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Inmutabilidad}
+    \begin{itemize}
+        \item Las cadenas de texto son ``inmutables'' \lstinline|=| no pueden ser modificadas.
+    \end{itemize}
+    
+\begin{lstlisting}
+s = "hello"
+s[0] = 'y'            # error
+s = 'y' + s[1:len(s)] # redefinir
+\end{lstlisting}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\textwidth]{figs/strings/inmutability-strings.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Recapitulación de \lstinline|for|}
+    \begin{itemize}
+        \item Previamente, aprendimos que \lstinline|for| trabaja en conjunto con la función \lstinline|range|.
+\begin{lstlisting}
+for var in range(4): 
+    <expresiones>
+    ...
+
+for var in range(4, 10):
+    <expresiones>
+    ...
+\end{lstlisting}
+
+        \item Los ciclos \lstinline|for| pueden iterar sobre {\blue cualquier conjunto de valores}, ¡no solamente números!
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Cadenas de texto y ciclos}
+    \begin{itemize}
+        \item Los bloques de abajo son {\blue\bfseries equivalentes}.
+        
+    \end{itemize}
+\begin{lstlisting}
+s = "abcdefgh"
+
+for index in range(len(s)):
+    if s[index] == 'i' or s[index] == 'u':
+        print("There is an i or u")
+
+for char in s:
+    if char == 'i' or char == 'u':
+        print("There is an i or u")
+\end{lstlisting}
+
+    \bottomline{El último es más \textit{Pythónico}.}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo: porristas robot}
+\begin{lstlisting}
+an_letters = "aefhilmnorsxAEFHILMNORSX"
+word = input("I will cheer for you! Enter a word: ")
+times = int(input("Enthusiasm level (1-10): "))
+
+i = 0
+while i < len(word):
+   char = word[i]
+   if char in an_letters:
+       print("Give me an " + char + "! " + char)
+   else:
+       print("Give me a  " + char + "! " + char)
+   i += 1
+   
+print("What does that spell?")
+for i in range(times):
+   print(word, "!!!")
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo: porristas robot}
+\begin{lstlisting}
+an_letters = "aefhilmnorsxAEFHILMNORSX"
+word = input("I will cheer for you! Enter a word: ")
+times = int(input("Enthusiasm level (1-10): "))
+
+for char in word:
+   if char in an_letters:
+       print("Give me an " + char + "! " + char)
+   else:
+       print("Give me a  " + char + "! " + char)
+       
+   
+print("What does that spell?")
+for i in range(times):
+   print(word, "!!!")
+\end{lstlisting}
+\end{frame}
+
+
+
+\section{Guess and check}
+
+\begin{frame}{\textit{Guess and check}}
+    \begin{itemize}
+        \item A este tipo de algoritmos se les conoce también como de {\bfseries\blue enumeración exhaustiva}. 
+    \end{itemize}
+    
+    \begin{cpage}
+    \begin{enumerate}
+        \item Dado un problema.
+        \item Podemos {\blue proponer/adivinar} una solución.
+        \item Podemos {\blue verificar} que la solución es correcta.
+        \item Repetimos 1,2 y 3 hasta encontrar la solución.
+    \end{enumerate}
+    \end{cpage}
+\end{frame}
+
+\begin{frame}[fragile]{Cubos perfectos}
+    \begin{itemize}
+        \item Veamos un ejemplo de {\bfseries\blue enumeración exhaustiva}.
+        
+\begin{lstlisting}
+#cube = 27
+##cube = 8120601
+
+for guess in range(cube+1):
+    if guess**3 == cube:
+        print("Cube root of", cube, "is", guess)
+\end{lstlisting}
+
+        \item ¿Cómo podemos salir si encontramos la solución?
+        \item ¿Qué pasa si \lstinline|cube| no tiene cubo perfecto o es negativo?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Cubos perfectos}
+    \begin{itemize}
+        \item Veamos una posible solución
+    \end{itemize}
+\begin{lstlisting}
+cube = 27
+#cube = 8120601
+for guess in range(abs(cube)+1):
+   # passed all potential cube roots
+   if guess**3 >= abs(cube):
+       # no need to keep searching
+       break
+if guess**3 != abs(cube):
+   print(cube, 'is not a perfect cube')
+else:
+   if cube < 0:
+       guess = -guess
+   print('Cube root of ' + str(cube) + ' is ' + str(guess))
+\end{lstlisting}
+\end{frame}
+
+\section{Métodos de aproximación}
+
+\begin{frame}[fragile]{Soluciones aproximadas}
+    \begin{itemize}
+        \item En ocasiones, basta con una solución lo {\blue\bfseries suficientemente buena}. 
+        
+        \begin{enumerate}
+            \item Dado un problema.
+            \item Emmpezamos con una solución y aumentamos por un {\blue pequeño valor}.
+            \item Si \lstinline&|guess**3 - cube| >= epsilon &, seguimos probando. 
+        \end{enumerate}
+        
+        \item Si aumentamos $\epsilon \Rightarrow$ {\blue menor precisión}.
+        \item Si disminuimos $\epsilon \Rightarrow$ {\blue mayor lentitud}.
+    \end{itemize} 
+\end{frame}
+
+\begin{frame}[fragile]{Raíz cúbica aproximada}
+    \begin{itemize}
+        \item Veamos el siguiente ejemplo.
+    \end{itemize}
+\begin{lstlisting}[numbers=left]
+cube = 27
+
+epsilon = 0.1
+guess = 0.0
+increment = 0.01
+num_guesses = 0
+# look for close enough answer and make sure
+# didn't accidentally skip the close enough bound
+while abs(guess**3 - cube) >= epsilon and guess <= cube:
+   guess += increment
+   num_guesses += 1
+print('num_guesses =', num_guesses)
+if abs(guess**3 - cube) >= epsilon:
+   print('Failed on cube root of', cube)
+else:
+   print(guess, 'is close to the cube root of', cube)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Búsqueda por bisección}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \includesvg[width=0.9\textwidth]{figs/strings/Bisection_method}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item En cada iteración, seleccionamos una {\blue mitad} del intervalo.
+                \item Solución candidata en el intervalo.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]{Raíces cúbicas}
+\begin{lstlisting}
+cube = 27
+
+epsilon = 0.01
+num_guesses, low = 0, 0
+high = cube
+guess = (high + low)/2.0
+
+while abs(guess**3 - cube) >= epsilon:
+   if guess**3 < cube:
+       # look only in upper half search space
+       low = guess
+   else:
+       # look only in lower half search space
+       high = guess
+   
+   guess = (high + low)/2.0
+   num_guesses += 1
+print('num_guesses: ', num_guesses, 'raiz: ', guess)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Acerca de la convergencia}
+    \begin{itemize}
+        \item La solución candidata converge en un orden de $\log_2 N$ pasos.
+        \item La {\blue búsqueda de bisección} funciona cuando la función varía {\blue monótonamente} de acuerdo a la entrada.
+        
+        \item El código anterior funciona solamente para cubos positivos mayores a $1$. ¿Por qué?
+    \end{itemize}
+    
+    \bottomline{¿Cómo podemos modificar el código para que funcione con cubos negativos y positivos $< 1$?}
+\end{frame}
+
+
+%-----------------------------------------------------------------
+% Termina el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{comment}
+\begin{frame}[fragile]{Búsqueda por bisección}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+\end{comment}
+
+\end{document}

@@ -1,0 +1,392 @@
+%-----------------------------------------------------------------
+% Rodrigo Chang, 2019
+% Banco de Guatemala
+% Programa de Estudios Superiores 2019-2020
+% Diapositivas del curso "Programación I"
+%
+% Descargo de responsabilidad.
+%   El contenido de este documento es responsabilidad exclusiva de
+% su(s) autores. Cualquier opinión expresada no necesariamente
+% representa la postura institucional del Banco de Guatemala. 
+% 
+% Contenido.
+%   El contenido de estas diapositivas está construido a partir de 
+% modificaciones al material provisto por Ana Bell, Eric Grimson y 
+% John Guttag para el curso 6.0001 Introduction to Computer Science 
+% and Programming in Python, otoño 2016, Massachusetts Institute of 
+% Technology: MIT OpenCourseWare, https://ocw.mit.edu
+%
+% Licencia: 
+% Creative Commons BY-NC-SA
+% https://creativecommons.org/licenses/by-nc-sa/4.0/.
+%
+% Formato. 
+%   El formato utilizado para la elaboración de este documento 
+% ha sido modificado a partir del repositorio: 
+%       https://github.com/rinnert/statlearning-python-pwf
+%
+% Kurt Rinnert, 2019
+%   Copying and distribution of this file, with or without 
+% modification, are permitted in any medium without royalty provided 
+% the copyright notice and this notice are preserved. This file is 
+% offered as-is, without any warranty.
+%
+%-----------------------------------------------------------------
+\documentclass[mathserif]{beamer}
+% Para configurar las diapositivas en relación 16:9, 
+% agregar la opción aspectratio=169
+
+% Título de la presentación y tópicos a tratar
+\input{preamble}
+\subtitle{%
+  \bfseries{Funciones: descomposición y abstracción}\\%
+  %{\tiny\it Manejo de strings, \textit{guess and check}, métodos de aproximación}\\%
+}
+
+% Inicio del documento
+\begin{document}
+\input{common}
+%-----------------------------------------------------------------
+% Empieza el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{frame}{Abstract}
+	\Quote{Programs must be written for people to read, and only incidentally for machines to execute.}{Harold Abelson, Structure and Interpretation of Computer Programs }
+    
+	\begin{blurb}
+		Veremos cómo estructurar programas en funciones para ocultar detalles.
+		
+		Hablaremos de los conceptos de alcance (\textit{scope}) y espacio de nombres (\textit{name space}) en Python.
+		
+	\end{blurb}
+\end{frame}
+
+\section{Descomposición y abstracción}
+
+\begin{frame}[fragile]{¿Cómo escribimos código?}
+    \begin{itemize}
+        \item Hasta ahora: 
+        \begin{itemize}
+            \item Hemos visto algunos mecanismos del lenguaje.
+            \item Código en un bloque (celda) representa algún cómputo.
+            \item Cada archivo (celda) es una pieza de código.
+            \begin{itemize}
+                \item Cada código es una secuencia de instrucciones.
+            \end{itemize}
+        \end{itemize}
+        
+        \item Algunos {\blue problemas}:
+        \begin{itemize}
+            \item Es fácil para problemas a \textit{pequeña escala}.
+            \item Es {\blue\bfseries muy desordenado} para problemas más grandes.
+            
+            \item Es difícil {\blue\bfseries seguir} los detalles.
+            \item Información correcta $\Rightarrow$ parte código del código.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Buenas prácticas}
+    \begin{itemize}
+        \item Más código {\orange\bfseries no} es necesariamente algo bueno.
+        
+        \item Cantidad de \textit{funcionalidad} $\Rightarrow$ buenos programadores.
+        
+        \item Necesitamos un mecanismo para {\blue\bfseries descomponer} el código y {\blue\bfseries abstraer} la funcionalidad.
+        
+        \item Para esto, introducimos las {\bfseries\orange funciones}.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Abstracción}
+    \begin{itemize}
+        \item Un proyector es una caja negra --- {\blue no sabemos cómo funciona}. 
+        \item Sabemos cómo se utiliza y para qué sirve.
+        \item Conocemos la entrada: cualquier dispositivo electrónico que se pueda conectar.
+        \item Y la salida que produce.
+        \item Es una caja negra que convierte y magnifica imágenes de la entrada hacia una pantalla (pared).
+        
+    \end{itemize}
+    \bottomline{Esta es la idea detrás de la abstracción: no necesitamos saber cómo funciona para utilizarlo.}
+\end{frame}
+
+\begin{frame}[fragile]{Descomposición}
+    \begin{itemize}
+        \item Supongamos que queremos proyectar imágenes para las Olimpiadas con varios proyectores.
+        \item Cada proyector recibe una entrada y produce una salida individual.
+        \item Todos producen una imagen más grande.
+        
+    \end{itemize}
+    \bottomline{Esta es la idea detrás de la descomposición: diferentes dispositivos trabajan en conjunto para lograr un objetivo.}
+\end{frame}
+
+\begin{frame}[fragile]{Crear estructura con la descomposición}
+    \begin{itemize}
+        \item En programación, el código se divide en {\blue\bfseries módulos}:
+        \begin{itemize}
+            \item {\orange autocontenidos}
+            \item permiten {\orange\bfseries separar} el código,
+            \item {\orange\bfseries reutilizarlo},
+            \item mantenerlo {\orange\bfseries organizado} y 
+            \item {\bfseries\orange coherente}.
+        \end{itemize}
+    \end{itemize}
+    
+    \bottomline{Ahora utilizaremos funciones para descomponer el código, más adelante utilizaremos clases.}
+\end{frame}
+
+\begin{frame}[fragile]{Omitir detalles con la abstracción}
+    \begin{itemize}
+        \item En programación, puede pensarse en una {\blue\bfseries caja negra}: 
+        \begin{itemize}
+            \item No se quieren/necesitan ver los detalles.
+            \item Esconder detalles tediosos en el código.
+        \end{itemize}
+        
+        \item Esto lo lograremos con la {\bfseries\blue especificación adecuada} de una función:
+        \begin{itemize}
+            \item ¿Qué recibe como entradas y qué devuelve como salidas?.
+        \end{itemize}
+        
+        \item También será útil definir un {\blue\bfseries docstring}.
+    \end{itemize}
+    
+    \bottomline{Ahora utilizaremos funciones para descomponer el código, más adelante utilizaremos clases.}
+\end{frame}
+
+\begin{frame}[fragile]{Funciones}
+    \begin{itemize}
+        \item {\blue\bfseries Piezas} de código reutilizables.
+        
+        \item No se ejecutan hasta ser {\orange\bfseries llamadas} o {\orange\bfseries ``invocadas''}.
+        
+        \item Características: 
+        \begin{itemize}
+            \item Nombre
+            \item Parámetros (0 o más)
+            \item {\blue docstring}
+            \item cuerpo
+            \item {\blue devuelven} un resultado
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo}
+    \begin{itemize}
+        \item Veamos una función sencilla
+    \end{itemize}
+\begin{lstlisting}
+# Def. de funcion par
+def esPar(i):
+    """ 
+    Input: i, entero positivo
+    Devuelve True si i es par, si no, False
+    """
+    remainder = i % 2
+    return remainder == 0
+\end{lstlisting}
+\end{frame}
+
+
+
+\section{Alcance (\textit scope) de las variables}
+
+\begin{frame}[fragile]{Alcance (\textit scope) de las variables}
+    \begin{itemize}
+        \item Una función crea un nuevo ambiente/marco/\textit{scope} {\blue\bfseries cuando se ejecuta}.
+        
+        \item {\blue\bfseries scope} se refiere al mapeo de nombres a objetos.
+        
+        \item El {\orange parámetro formal} recibe el valor del {\orange parámetro real}.  
+    
+\begin{lstlisting}
+def f(x):
+    x = x + 1
+    print('dentro de f(x): x =', x)
+    return x
+
+x = 3
+z = f( x )
+\end{lstlisting}
+        
+        \item \href{http://www.pythontutor.com/visualize.html#code=def%20f%28x%29%3A%0A%20%20%20%20x%20%3D%20x%20%2B%201%0A%20%20%20%20print%28'in%20f%28x%29%3A%20x%20%3D',%20x%29%0A%20%20%20%20return%20x%0A%0Ax%20%3D%203%0Az%20%3D%20f%28%20x%20%3D%20x%20%29&cumulative=false&curInstr=0&heapPrimitives=nevernest&mode=display&origin=opt-frontend.js&py=3&rawInputLstJSON=%5B%5D&textReferences=false}{Ver en Python Tutor}
+    
+    \end{itemize}
+    \bottomline{¿Qué pasa si \lstinline|z = f( x = x )|? }
+\end{frame}
+
+
+\begin{frame}[fragile]{Funciones sin \lstinline|return|}
+    \begin{itemize}
+        \item También llamadas {\blue procedimientos}. 
+        \item En Python, devuelven \lstinline|None| (ausencia de valor).
+    \end{itemize}
+\begin{lstlisting}
+# Def. de funcion par
+def esPar(i):
+    """ 
+    Input: i, entero positivo
+    Imprime True si i es par, si no, False
+    """
+    remainder = i % 2
+    print(remainder == 0)
+\end{lstlisting}
+\end{frame}
+
+% Diferencia print vs return
+\begin{frame}[fragile]{\lstinline|return| vs. \lstinline|print|}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \lstinline|return|:
+        \begin{itemize}
+            \item Significado {\blue dentro} de una función.
+            \item Se ejecuta {\blue\bfseries solo uno}.
+            \item Después de \lstinline|return|, código es {\blue ignorado}.
+            \item Tiene valor asociado, {\blue devuelto a quién invoca la función}.
+        \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+        \begin{itemize}
+            \item Puede ser utilizado {\blue fuera} de una función.
+            \item Pueden ejecutarse {\blue\bfseries varios}.
+            \item Después de \lstinline|print|, código es {\blue ejecutado}.
+            \item Devuelve \lstinline|None|, pero su salida es hacia la {\blue\bfseries consola}.
+        \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Funciones pueden ser argumentos y valores de retorno
+\includeslides{21-24}{slides-60001/MIT6_0001F16_Lec4_mod.pdf}{Funciones como argumentos}
+
+% Ejemplo de scopes
+
+\begin{frame}[fragile]{Scope (ambiente/alcance)}
+    \begin{itemize}
+        \item Dentro de una función, {\blue\bfseries se puede acceder} a una variable definida afuera.     
+\begin{lstlisting}
+def g(y):
+    print(x)
+    print(x+y)
+
+x = 5
+g(x)
+print(x)
+\end{lstlisting}
+
+    \item Otro ejemplo: 
+\begin{lstlisting}
+def g(y):
+    print(x)
+
+x = 5
+g(x)
+print(x)
+\end{lstlisting}
+        
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Scope (ambiente/alcance)}
+    \begin{itemize}
+        \item Dentro de una función, {\blue\bfseries no se puede modificar una variable\footnote{Excepto si la variable es mutable} definida afuera.}
+\begin{lstlisting}
+def h(y):
+    x += 1
+
+x = 5
+h(x)
+print(x)
+\end{lstlisting}
+    
+    \item \href{https://www.python-course.eu/python3_passing_arguments.php}{¿Cómo funcionan los argumentos en Python?}
+    
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Detalles en el \textit{scope}}
+    \begin{itemize}
+        \item Veamos un ejemplo más detallado: 
+\begin{lstlisting}
+def g(x):
+    def h():
+        x = 'abc'
+    x = x + 1
+    print('in g(x): x =', x)
+    h()
+    return x
+
+x = 3
+z = g(x)
+\end{lstlisting}
+        
+        \item \href{http://www.pythontutor.com/visualize.html#code=def%20g(x%29%3A%0A%20%20%20%20def%20h(%29%3A%0A%20%20%20%20%20%20%20%20x%20%3D%20'abc'%0A%20%20%20%20x%20%3D%20x%20%2B%201%0A%20%20%20%20print('in%20g(x%29%3A%20x%20%3D',%20x%29%0A%20%20%20%20h(%29%0A%20%20%20%20return%20x%0A%0Ax%20%3D%203%0Az%20%3D%20g(x%29&cumulative=false&curInstr=0&heapPrimitives=false&mode=display&origin=opt-frontend.js&py=3&rawInputLstJSON=%5B%5D&textReferences=false}{Ver en Python Tutor}
+    \end{itemize}
+\end{frame}
+
+% Ejecución del ejemplo anterior 
+\includeslides{29-33}{slides-60001/MIT6_0001F16_Lec4_mod.pdf}{Detalles en el \textit{scope}}
+
+\begin{frame}[fragile]{Descomposición y abstracción}
+    \begin{itemize}
+        \item Concepto {\blue\bfseries poderoso}.
+        
+        \item El código es {\blue\bfseries REUTILIZABLE} y solamente tiene que ser {\orange\bfseries depurado} una vez.
+    \end{itemize}
+\end{frame}
+
+% Paso de argumentos
+% https://www.python-course.eu/python3_passing_arguments.php
+
+%-----------------------------------------------------------------
+% Termina el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{comment}
+
+% Slide with two columns, half and half
+\begin{frame}[fragile]{}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide with bullets
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+% Slide with bullets and code
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\begin{lstlisting}
+Code goes here
+\end{lstlisting}
+\end{frame}
+
+% Include PDF 
+\setbeamercolor{background canvas}{bg=}
+\includepdf[pages=541-542, link=true, fitpaper]{slides-60001/MIT6_0001F16_Lec4.pdf}
+
+% Include PDF slides with title
+\setbeamercolor{background canvas}{bg=}
+\includepdf[pages={21-22}, link=true, pagecommand={%
+\Large\blue\bfseries\underline{%
+Título de las diapositivas\phantom{g}}%
+\vspace{-1em}%
+\vskip 1.0mm}]{slides-60001/MIT6_0001F16_Lec4_mod.pdf}
+
+% Pytutor
+\href{URL}{Ver en Python Tutor}
+
+
+\end{comment}
+
+\end{document}

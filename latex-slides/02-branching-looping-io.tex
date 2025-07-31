@@ -1,0 +1,363 @@
+%-----------------------------------------------------------------
+% Rodrigo Chang, 2019
+% Banco de Guatemala
+% Programa de Estudios Superiores 2019-2020
+% Diapositivas del curso "Programación I"
+%
+% Descargo de responsabilidad.
+%   El contenido de este documento es responsabilidad exclusiva de
+% su(s) autores. Cualquier opinión expresada no necesariamente
+% representa la postura institucional del Banco de Guatemala. 
+% 
+% Contenido.
+%   El contenido de estas diapositivas está construido a partir de 
+% modificaciones al material provisto por Ana Bell, Eric Grimson y 
+% John Guttag para el curso 6.0001 Introduction to Computer Science 
+% and Programming in Python, otoño 2016, Massachusetts Institute of 
+% Technology: MIT OpenCourseWare, https://ocw.mit.edu
+%
+% Licencia: 
+% Creative Commons BY-NC-SA
+% https://creativecommons.org/licenses/by-nc-sa/4.0/.
+%
+% Formato. 
+%   El formato utilizado para la elaboración de este documento 
+% ha sido modificado a partir del repositorio: 
+%       https://github.com/rinnert/statlearning-python-pwf
+%
+% Kurt Rinnert, 2019
+%   Copying and distribution of this file, with or without 
+% modification, are permitted in any medium without royalty provided 
+% the copyright notice and this notice are preserved. This file is 
+% offered as-is, without any warranty.
+%
+%-----------------------------------------------------------------
+\documentclass[mathserif]{beamer}
+% Para configurar las diapositivas en relación 16:9, 
+% agregar la opción aspectratio=169
+
+% Título de la presentación y tópicos a tratar
+\input{preamble}
+\subtitle{\bfseries%
+  {Control de flujo e iteraciones}\\%
+  %{\tiny\it Control de flujo e iteraciones}\\%
+}
+
+% Inicio del documento
+\begin{document}
+\input{common}
+%-----------------------------------------------------------------
+% Empieza el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{frame}{Abstract}
+	\Quote{I taught myself how to program computers when I was a kid, bought my first computer when I was 10, and sold my first commercial program when I was 12.}{Elon Musk}
+    
+    % Everybody should learn to program a computer, because it teaches you how to think. - Steve Jobs
+    
+    % Whether you want to uncover the secrets of the universe, or you just want to pursue a career in the 21st century, basic computer programming is an essential skill to learn. - Stephen Hawking
+    
+    % I taught myself how to program computers when I was a kid, bought my first computer when I was 10, and sold my first commercial program when I was 12. - Elon Musk
+
+	\begin{blurb}
+		Veremos como obtener una entrada del usuario y generar una salida a través de la línea de comandos.
+		
+		Hablaremos de las condicionales y de las estructuras de iteración.
+	\end{blurb}
+\end{frame}
+
+\section{Entradas y salidas}
+
+\begin{frame}[fragile]{Cadenas de texto (introducción)}
+    \begin{itemize}
+        \item Son objetos de tipo {\blue no escalar} que permiten manejar {\orange números, letras, espacios y caracteres especiales}.
+        \item Se encierran en {\blue comillas} dobles o simples.
+\begin{lstlisting}
+hello = "Hola mundo"
+hi = 'Hola amigos del PES'        
+\end{lstlisting}
+        
+        \item Podemos {\blue concatenar} cadenas de texto con el operador \lstinline|+|:
+\begin{lstlisting}
+nombre = "Antonio"
+saludo = hello + " " + nombre
+\end{lstlisting}
+        
+        \item Podemos efectuar otras operaciones: 
+\begin{lstlisting}
+molesto = hello + " " + nombre*3
+\end{lstlisting}
+    \end{itemize} 
+\end{frame}
+
+
+\begin{frame}[fragile]{Salida en consola}
+    \begin{itemize}
+        \item Utilizamos la función \lstinline|print|.
+\begin{lstlisting}
+print("Hola mundo")
+\end{lstlisting}
+        
+        \item Podemos enviar {\blue varios argumentos} a la función para imprimirlos todos. Podemos separar los elementos con el caracter especificado en el argumento \lstinline|sep=' '|.
+\begin{lstlisting}
+pi=3.1415
+print(pi, 2, "amigos")
+print(1, 'Python Tricks', 'Dan Bader', sep=',')
+\end{lstlisting}        
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Combinar variables en el texto}
+    \begin{itemize}
+        \item Será útil en muchas ocasiones, combinar en un mensaje de salida una o más variables.
+        
+        \item Para esto, utilizamos el operador \lstinline|%|. 
+\begin{lstlisting}
+pi=3.1415
+print("Hola %s, Pi=%0.4f" % ('Rodrigo', pi))
+\end{lstlisting}           
+        
+        \item También es posible utilizando diccionarios:
+\begin{lstlisting}
+print("Pi=%(pi)s" % {'pi' : pi})
+\end{lstlisting}
+
+        \item Otras especificaciones posibles: 
+            \begin{itemize}
+                \item \lstinline|%d| para números enteros.
+                \item \lstinline|%s| para cadenas de texto.
+                \item \lstinline|%f| para números de punto flotante.
+            \end{itemize}
+        
+    \end{itemize}
+    \bottomline{\url{https://realpython.com/python-string-formatting/}}
+\end{frame}
+
+\begin{frame}[fragile]{Entrada vía línea de comandos}
+    \begin{itemize}
+        \item Utilizamos el la función \lstinline|input("")|.
+        
+        \item Devuelve el valor escrito por el usuario a una variable:
+\begin{lstlisting}
+nombre = input("Ingresa tu nombre: ")
+print("Hola " + nombre)
+\end{lstlisting}
+
+        \item \lstinline|input| devuelve objetos de tipo \lstinline|str|. Al trabajar con números se deben convertir los tipos:
+\begin{lstlisting}
+r = float(input("Ingresa el radio: "))
+area = 3.14159*(r**2)
+\end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+\section{Flujo de control}
+
+\begin{frame}[fragile]{Condicionales}
+    \begin{itemize}
+        \item Podemos decidir si ejecutar un grupo de instrucciones con la siguiente estructura. \lstinline|<condition>| debe ser booleana.
+\begin{lstlisting}
+if <condition>:
+    <expression>
+    <expression>
+    ...
+\end{lstlisting}
+
+        \item La cláusula \lstinline|else| indica las instrucciones a evaluar si la condicion es {\blue falsa}.
+\begin{lstlisting}
+if <condition>:
+    <expression>
+    ...
+else:
+    <expression>
+    ...
+\end{lstlisting}
+
+    \end{itemize}
+    
+    \bottomline{La indentación es IMPORTANTE, esta es la forma en que Python estructura los bloques.}
+\end{frame}
+
+\begin{frame}[fragile]{Condicionales}
+    \begin{itemize}
+        \item La cláusula \lstinline|elif| permite añadir condiciones adicionales.
+\begin{lstlisting}
+if <condition>:
+    <expression>
+    ...
+elif <condition>:
+    <expression>
+    ...
+else:
+    <expression>
+    ...
+\end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Bloques de código}
+\begin{lstlisting}
+x = float(input("Enter a number for x: "))
+y = float(input("Enter a number for y: "))
+if x == y:
+   print("x and y are equal")
+   if y != 0:
+       print("therefore, x / y is", x/y)
+elif x < y:
+   print("x is smaller")
+elif x > y:
+   print("y is smaller")
+print("thanks!")
+\end{lstlisting}
+\end{frame}
+
+
+\section{Estructuras de iteración}
+
+\begin{frame}[fragile]{Ciclo \lstinline|while|}
+    \begin{itemize}
+        \item Cuando queremos repetir una expresión {\blue hasta} que se cumpla una condición. 
+\begin{lstlisting}
+while <condition>:
+    <expression>
+    <expression>
+    ...
+\end{lstlisting}
+
+        \item Nuevamente, \lstinline|<condition>| debe ser de tipo booleano.
+        
+        \item Si la condición es \lstinline|True|, el bloque se ejecuta. 
+        
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ciclo \lstinline|while|}
+    \begin{itemize}
+        \item Veamos un ejemplo con ciclo \lstinline|while|.
+    \end{itemize}
+    \lstinputlisting{codes/02-while-example.py}
+\end{frame}
+
+\begin{frame}[fragile]{Ciclos \lstinline|for|}
+    \begin{itemize}
+        \item Cuando queremos iterar sobre números de una secuencia.
+        
+\begin{lstlisting}
+# more complicated with while loop
+n = 0
+while n < 5:
+    print(n)
+    n = n+1
+
+# shortcut with for loop
+for n in range(5):
+    print(n)
+\end{lstlisting}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ciclos \lstinline|for|}
+    \begin{itemize}
+        \item En cada iteración, \lstinline|<variable>| toma un valor.
+\begin{lstlisting}
+for <variable> in range(<some_num>):
+    <expression>
+    ...
+\end{lstlisting}
+        
+        \item La primera vez, toma el valor más pequeño, \lstinline|0|. 
+        \item La siguiente vez, toma el valor anterior + 1.
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Función \lstinline|range|}
+    \begin{itemize}
+        \item Los argumentos \lstinline|start| y \lstinline|step| son opcionales.
+        \item Tienen valores por defecto: \lstinline|start = 0| y \lstinline|step = 1|.
+        
+        \item El ciclo llega hasta \lstinline|stop - 1|.
+        %\item Devuelve un objeto de tipo \lstinline|'range'|.
+    \end{itemize}
+\begin{lstlisting}
+# Sumamos números de 7 a 9
+mysum = 0
+for i in range(7, 10):
+    mysum += i
+    print(mysum)
+
+# Sumamos números impares
+mysum = 0
+for i in range(5, 11, 2):
+    mysum += i
+    print(mysum)
+\end{lstlisting}
+    
+    \bottomline{Note el uso del operador abreviado \lstinline|+=|.}
+\end{frame}
+
+
+\begin{frame}[fragile]{Sentencia \lstinline|break|}
+    \begin{itemize}
+        \item {\blue\bfseries Fuerza} la salida del ciclo actual.
+        \item Instrucciones posteriores son ignoradas.
+        \item Solamente actúa en el {\blue ciclo más interno}.
+    \end{itemize}
+\begin{lstlisting}
+while <condition_1>:
+    while <condition_2>:
+        <expression_A>
+        break
+        <expression_B>
+    <expression_C>
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Sentencia \lstinline|break|}
+\begin{lstlisting}
+mysum= 0
+for i in range(5, 11, 2):
+    mysum += i
+    if mysum == 5: 
+        break
+        mysum += 1 
+print(mysum)
+\end{lstlisting}
+
+    \bottomline{¿Qué pasa en este programa?}
+\end{frame}
+
+
+\begin{frame}{Ciclos \lstinline|for| vs. \lstinline|while|}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \begin{cpage}
+            \centering\lstinline|for|
+        \end{cpage}
+        \begin{itemize}
+            \item Se {\blue conoce} el número de iteraciones.
+            \item Admite \lstinline|break|.
+            \item Utiliza un {\blue contador} o {\blue lista}.
+            \item Se puede {\blue reescribir} un ciclo \lstinline|for| utilizando \lstinline|while|.
+        \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+        \begin{cpage}
+            \centering\lstinline|while|
+        \end{cpage}
+        \begin{itemize}
+            \item Número de iteraciones no acotado. 
+            \item Admite \lstinline|break|.
+            \item Puede utilizar {\blue contador} pero {\orange debe inicializarlo y actualizarlo} en el ciclo.
+            \item Puede {\orange no} ser posible {\blue reescribir} un ciclo \lstinline|while| utilizando \lstinline|for|.
+        \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+%-----------------------------------------------------------------
+% Termina el contenido de la presentación
+%-----------------------------------------------------------------
+\end{document}

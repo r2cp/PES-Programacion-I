@@ -1,0 +1,456 @@
+%-----------------------------------------------------------------
+% Rodrigo Chang, 2019
+% Banco de Guatemala
+% Programa de Estudios Superiores 2019-2020
+% Diapositivas del curso "Programación I"
+%
+% Descargo de responsabilidad.
+%   El contenido de este documento es responsabilidad exclusiva de
+% su(s) autores. Cualquier opinión expresada no necesariamente
+% representa la postura institucional del Banco de Guatemala. 
+% 
+% Contenido.
+%   El contenido de estas diapositivas está construido a partir de 
+% modificaciones al material provisto por Ana Bell, Eric Grimson y 
+% John Guttag para el curso 6.0001 Introduction to Computer Science 
+% and Programming in Python, otoño 2016, Massachusetts Institute of 
+% Technology: MIT OpenCourseWare, https://ocw.mit.edu
+%
+% Licencia: 
+% Creative Commons BY-NC-SA
+% https://creativecommons.org/licenses/by-nc-sa/4.0/.
+%
+% Formato. 
+%   El formato utilizado para la elaboración de este documento 
+% ha sido modificado a partir del repositorio: 
+%       https://github.com/rinnert/statlearning-python-pwf
+%
+% Kurt Rinnert, 2019
+%   Copying and distribution of this file, with or without 
+% modification, are permitted in any medium without royalty provided 
+% the copyright notice and this notice are preserved. This file is 
+% offered as-is, without any warranty.
+%
+%-----------------------------------------------------------------
+\documentclass[mathserif]{beamer}
+% Para configurar las diapositivas en relación 16:9, 
+% agregar la opción aspectratio=169
+
+% Título de la presentación y tópicos a tratar
+\input{preamble}
+\subtitle{%
+  \bfseries{Programación orientada a objetos}\\%
+  %{\tiny\it Manejo de strings, \textit{guess and check}, métodos de aproximación}\\%
+}
+
+% Inicio del documento
+\begin{document}
+\input{common}
+%-----------------------------------------------------------------
+% Empieza el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{frame}{Abstract}
+	\Quote{Commenting your code is like cleaning your bathroom — you never want to do it, but it really does create a more pleasant experience for you and your guests.}{Ryan Campbell}
+    
+	\begin{blurb}
+		Veremos conceptos básicos y ejemplos del paradigma de programación orientada a objetos.
+	\end{blurb}
+\end{frame}
+
+
+\section{Programación orientada a objetos}
+
+% Objetos
+\begin{frame}[fragile]{Objetos}
+    \begin{itemize}
+        \item Como vimos antes, Python representa información de diferentes formas:
+\begin{lstlisting}
+1234    3.14159     "Hello"
+[2, 4, 6, 8, 10]
+{"GT": "Guatemala", "HN":"Honduras"}
+\end{lstlisting}
+        
+        \item Cada uno es un {\blue\bfseries objeto}, el cual tiene:
+        \begin{itemize}
+            \item Un {\orange tipo}.
+            \item Una {\orange representación interna} (primitiva o compuesta).
+            \item Un conjunto de procedimientos de {\orange interacción} con el objeto.
+        \end{itemize}
+        
+        \item Un objeto es una {\blue\bfseries instancia} de un tipo:
+        \begin{itemize}
+            \item \lstinline|1234| es una instancia de un entero :  \lstinline|int|.
+            \item \lstinline|"hello"| es una instancia de un \textit{string}: \lstinline|str|.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Programación orientada a objetos
+\begin{frame}[fragile]{Programación orientada a objetos}
+    \begin{itemize}
+        \item En Python, {\blue\bfseries ¡TODO ES UN OBJETO!}
+        
+        \item Podemos {\orange\bfseries crear nuevos objetos} de algún tipo.
+        
+        \item Podemos {\orange\bfseries manipular objetos}.
+        \item Podemos {\orange\bfseries destruir objetos}.
+        \begin{itemize}
+            \item Utilizando \lstinline|del| o ``dejándolos'' a un lado\footnote{Python utiliza un sistema de recolección de memoria para objetos destruidos o inaccesibles, llamado ``recolección de basura''.}.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Objetos nuevamente - representación interna
+\begin{frame}[fragile]{Ya en serio: ¿qué son los objetos?}
+    \begin{itemize}
+        \item Representan una {\orange\bfseries abstracción de datos} que captura:
+        
+        \item Una {\blue\bfseries representación interna}:
+        \begin{itemize}
+            \item A través de \emph{atributos}.
+        \end{itemize}
+        
+        \item Una {\blue\bfseries interfaz} para interactuar con el objeto:
+        \begin{itemize}
+            \item A través de \emph{métodos} ({\footnotesize alias procedimientos/funciones})
+            \item Que definen el comportamiento, pero {\blue ocultan detalles de implementación}.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Ejemplo con listas
+\includeslides{5}{slides-60001/MIT6_0001F16_Lec8_mod.pdf}{Ejemplo: \lstinline|[1,2,3,4]| es de tipo lista}
+
+% Ventajas de la OOP
+\begin{frame}[fragile]{Ventajas de la OOP}
+    \begin{itemize}
+        \item Permiten {\blue\bfseries empaquetar} datos y procedimientos para trabajar sobre estos con interfaces bien definidas.
+        
+        \item Desarrollo al estilo ``{\blue\bfseries divide y conquistarás}''
+        \begin{itemize}
+            \item Implementación y pruebas sobre cada clase separada.
+            \item Incrementan la modularidad y reducen la complejidad.
+        \end{itemize}
+        
+        \item Permiten {\blue\bfseries reutilizar} el código fácilmente.
+        \begin{itemize}
+            \item Muchos módulos definen nuevas clases.
+            \item Cada clase tiene un ambiente separado (no hay problemas de nombres de funciones).
+            \item La {\orange herencia} permite redefinir o extender el comportamiento de una clase padre. 
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Crear y usar un tipo propio
+\begin{frame}[fragile]{Las clases implementan tipos propios}
+    \begin{itemize}
+        \item Existe una diferencia entre {\blue\bfseries crear una clase} e {\blue\bfseries instanciar una clase}.
+        
+        \item {\blue\bfseries Crear} una clase involucra
+        \begin{itemize}
+            \item Definir el nombre de la clase.
+            \item Definir los atributos.
+            \item Por ejemplo: \textit{alguien definió la clase \lstinline|list|, sus atributos y métodos}.
+        \end{itemize}
+        
+        \item {\blue\bfseries Utilizar} la clase involucra:
+        \begin{itemize}
+            \item Crear una nueva {\orange instancia} del objeto.
+            \item Realizar operaciones con la instancia.
+            \item Por ejemplo: \lstinline|L=[1,2]| y \lstinline|len(L)|.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+% Definición de una clase
+\begin{frame}[fragile]{Definición de una clase}
+    \begin{itemize}
+        \item Para definir un nuevo tipo, utilizamos la palabra \lstinline|class|:
+\begin{lstlisting}
+class Coordinate(object):
+    #define attributes here
+\end{lstlisting}
+
+         \item Similar a \lstinline|def|, {\blue indentamos} para indicar qué elementos pertenecen a la clase.
+         
+         \item \lstinline|object| se refiere a la {\blue clase padre} de \lstinline|Coordinate|.
+         \begin{itemize}
+             \item \lstinline|Coordinate| es una subclase de \lstinline|object|.
+             \item \lstinline|object| es una superclase de \lstinline|Coordinate|.
+         \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% ¿Qué son atributos?
+\begin{frame}[fragile]{¿Qué son atributos?}
+    \begin{itemize}
+        \item Datos y funciones que {\orange\bfseries pertenecen} a la clase.
+        \item {\orange\bfseries Atributos de datos}
+        \begin{itemize}
+            \item Objetos de datos que componen la clase.
+            \item Por ejemplo: en \lstinline|Coordinate| un atributo es la coordenada $x$.
+        \end{itemize}
+        
+        \item {\orange\bfseries Métodos}
+        \begin{itemize}
+            \item Funciones que solamente funcionan con esta clase.
+            \item Permiten {\blue interactuar} con el objeto.
+            \item En \lstinline|Coordinate| podríamos definir un método \lstinline|distance| que nos devuelva la distancia hacia otro objeto \lstinline|Coordinate|. 
+            \begin{itemize}
+                \item Notar que no necesariamente habría significado de \lstinline|distance| entre dos objetos \lstinline|list|.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% El método constructor
+\begin{frame}[fragile]{El método constructor}
+    \begin{itemize}
+        \item Primero debemos definir {\orange\bfseries cómo crear} una instancia de la clase.
+        
+        \item A este método le llamamos {\orange\bfseries constructor}. En Python, definimos la función \lstinline|__init__(self, ...)|.
+    \end{itemize}
+    
+\begin{lstlisting}
+class Coordinate(object):
+    def__init__(self, x, y):
+        self.x = x
+        self.y = y
+\end{lstlisting}
+\end{frame}
+
+% Instanciando una clase
+\begin{frame}[fragile]{Instanciando una clase}
+\begin{lstlisting}
+c = Coordinate(3,4)
+origin = Coordinate(0,0)
+print(c.x, origin.x)
+\end{lstlisting}
+
+    \begin{itemize}
+        \item Los atributos de datos de una instancia se convierten en {\orange\bfseries variables de la instancia}.
+        
+        \item Notar que:
+        \begin{itemize}
+            \item No proveemos argumento \lstinline|self| $\Rightarrow$ automático.
+            \item Utilización del \lstinline|.| para acceder a los atributos/métodos.
+            \item Al llamar a \lstinline|Coordinate|, invocamos la función \lstinline|__init__|.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% ¿Qué es un método?
+\begin{frame}[fragile]{¿Qué es un método?}
+    \begin{itemize}
+        \item Es también un atributo, pero {\orange\bfseries solo funciona con esta clase}.
+        
+        \item Python siempre pasa el objeto como primer argumento:
+        \begin{itemize}
+            \item Utilizamos \lstinline|self| como el primer argumento en cualquier método.
+        \end{itemize}
+        
+        \item {\blue\bfseries El operador \lstinline|.|} permite acceder a cualquier atributo. 
+        \begin{itemize}
+            \item Llamar a un método del objeto.
+            \item Acceder a los datos almacenados en el objeto.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Nuestro primer método
+\begin{frame}[fragile]{Nuestro primer método}
+\begin{lstlisting}
+class Coordinate(object):
+    """ A coordinate made up of an x and y value """
+    def __init__(self, x, y):
+        """ Sets the x and y values """
+        self.x = x
+        self.y = y
+    def distance(self, other):
+        """ Returns the euclidean distance between two points """
+        x_diff_sq = (self.x - other.x)**2
+        y_diff_sq = (self.y - other.y)**2
+        return (x_diff_sq + y_diff_sq)**0.5
+\end{lstlisting}
+    \begin{itemize}
+        \item Aparte de \lstinline|self| y la notación \lstinline|.|, los métodos {\orange\bfseries se comportan igual que las funciones}.
+        \begin{itemize}
+            \item Toman parámetros.
+            \item Realizan cómputos, procedimientos. 
+            \item Devuelven valores.
+        \end{itemize}
+    \end{itemize}
+    
+    \bottomline{¿Qué asume el método \lstinline|distance|?}
+\end{frame}
+
+% Cómo utilizar un método
+\begin{frame}[fragile]{Cómo utilizar un método}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \begin{itemize}
+            \item Forma convencional: lo invocamos sobre un objeto.
+\begin{lstlisting}
+c = Coordinate(3,4)
+zero = Coordinate(0,0)
+print(c.distance(zero))
+\end{lstlisting}
+            \item Notar que se omite \lstinline|self|, pues está implicado por el objeto \lstinline|c|.
+        \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+        \begin{itemize}
+            \item Equivalente a:
+\begin{lstlisting}
+c = Coordinate(3,4)
+zero = Coordinate(0,0)
+print(Coordinate.distance(c, zero))
+\end{lstlisting}
+            \item Se operan los dos objetos entre sí invocando el método {\blue desde la clase} y no desde una instancia.
+        \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Imprimir la representación de un objeto
+\begin{frame}[fragile]{}
+\begin{lstlisting}
+c = Coordinate(3,4)
+print(c)
+# Imprime: <__main__.Coordinate object at 0x7fa918510488>
+\end{lstlisting}
+    \begin{itemize}
+        \item Representación {\blue\bfseries poco informativa} por defecto.
+        
+        \item Podemos definir un método \lstinline|__str__| para una clase.
+        
+        \item Cuando utilizamos \lstinline|print| sobre un objeto, Python llama a su método \lstinline|__str__|.
+        
+        \item Podemos escoger qué mostrar, supongamos que queremos:
+    \end{itemize}
+\begin{lstlisting}
+print(c)
+# Queremos: <3, 4>
+\end{lstlisting}
+\end{frame}
+
+% Definición propia para print
+\begin{frame}[fragile]{Definición propia para \lstinline|print|}
+\begin{lstlisting}
+class Coordinate(object):
+    """ A coordinate made up of an x and y value """
+    def __init__(self, x, y):
+        """ Sets the x and y values """
+        self.x = x
+        self.y = y
+    def distance(self, other):
+        """ Returns the euclidean distance  """
+        x_diff_sq = (self.x-other.x)**2
+        y_diff_sq = (self.y-other.y)**2
+        return (x_diff_sq + y_diff_sq)**0.5
+    def __str__(self):
+        """ Returns a string representation of self """
+        return "<"+str(self.x)+","+str(self.y)+">"
+\end{lstlisting}
+    \bottomline{¿Qué tipo es devuelto por \lstinline|__str__|?}
+\end{frame}
+
+% Acerca de los tipos y las clases
+\includeslides{17}{slides-60001/MIT6_0001F16_Lec8_mod.pdf}{Acerca de los tipos y las clases}
+
+% Operadores especiales
+\includeslides{18}{slides-60001/MIT6_0001F16_Lec8_mod.pdf}{Operadores especiales}
+
+% Ejemplo de fracciones
+\begin{frame}[fragile]{Ejemplo: fracciones}
+    \begin{itemize}
+        \item Crearemos un {\blue\bfseries nuevo tipo} para representar fracciones.
+        
+        \item Su {\blue\bfseries representación interna} serán dos enteros:
+        \begin{itemize}
+            \item Numerador.
+            \item Denominador.
+        \end{itemize}
+        
+         \item Definiremos una interfaz (métodos) que permitirán:
+         \begin{itemize}
+             \item Sumar, restar.
+             \item Imprimir la fracción, convertir a flotante.
+             \item Obtener el recíproco.
+         \end{itemize}
+    \end{itemize}
+    \bottomline{Veamos el código}.
+\end{frame}
+
+% El poder de OOP
+\begin{frame}[fragile]{El poder de OOP}
+    \begin{itemize}
+        \item Podemos {\blue\bfseries empaquetar objetos} que comparten:
+        \begin{itemize}
+            \item Atributos comunes.
+            \item Procedimientos que operan sobre esos atributos.
+        \end{itemize}
+        
+        \item Utilizamos {\blue\bfseries abstracción} para diferenciar cómo implementar un objeto y cómo utilizarlo.
+        
+        \item Podemos construir {\blue\bfseries capas} de abstracción de objetos que {\orange hereden} comportamiento de otras clases de objetos.
+        
+         \item Podemos crear {\blue\bfseries nuestras propias clases de objetos} utilizando las clases base de Python.
+    \end{itemize}
+\end{frame}
+
+%-----------------------------------------------------------------
+% Termina el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{comment}
+
+% Slide with two columns, half and half
+\begin{frame}[fragile]{}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide with bullets
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+% Slide with bullets and subbullets
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item {\blue\bfseries A}
+        \begin{itemize}
+            \item a
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Slide with bullets and code
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\begin{lstlisting}
+Code goes here
+\end{lstlisting}
+\end{frame}
+
+% Slides PDF
+\includeslides{54-57}{slides-60001/MIT6_0001F16_Lec6_mod.pdf}{Eficiencia: Fibonacci con diccionarios}
+
+% Pytutor
+\href{URL}{Ver en Python Tutor}
+
+
+\end{comment}
+
+\end{document}
