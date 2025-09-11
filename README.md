@@ -14,11 +14,6 @@ Estaremos utilizando el libro de *Think Python* ya que fue recientemente actuali
 
 Este cronograma aplica para el curso intensivo de 9 días del PES 2025-2026: 
 
-| Fecha | Contenido | Taller | 
-| --- | --- | --- |
-| martes 16 | Introducción |  |
-
-
 - Martes 16: 
   - Bienvenida y lógistica del curso.
   - Introducción a conceptos de computación. 
@@ -46,14 +41,14 @@ Este cronograma aplica para el curso intensivo de 9 días del PES 2025-2026:
   - Algoritmos de ordenamiento. 
   - **Taller por la tarde:** Revisión de propuestas para proyecto grupal. 
 - Miércoles 24: 
+  - Examen corto: Creación y manejo de objetos.  
   - NumPy
   - matplotlib
   - **Taller por la tarde:** Publicación de reportes con Quarto. 
 - Jueves 25:
-  - Pandas (y algo de Polars)
+  - Pandas
   - Libre: e.g. statsmodels
   - **Taller por la tarde:** Tutorías para el proyecto. 
 - Viernes 26: 
-  - Examen corto. 
   - **Presentaciones de proyectos grupales**. 
   - **Taller por la tarde:** Inmersión de cervezas artesanales. 
