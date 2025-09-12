@@ -25,6 +25,7 @@ Este cronograma aplica para el curso intensivo de 9 días del PES 2025-2026:
   - Manipulación de cadenas de texto
   - Algoritmos de *guess and check*
   - **Taller por la tarde:** Git básico y GitHub. 
+  - **Entrega de tarea 1**. 
 - Jueves 18: 
   - Funciones, *scope* (alcance) y *namespaces*
   - Estructuras de datos: listas, tuplas.
@@ -32,23 +33,26 @@ Este cronograma aplica para el curso intensivo de 9 días del PES 2025-2026:
   - Estructuras de datos: diccionarios y recursión.
   - Técnicas de depuración.
   - **Taller por la tarde:** Tutorías para el proyecto. 
+  - **Entrega de tarea 2**. 
 - Lunes 22: 
-  - Programación orientada a objetos. 
-  - Herencia.
-  - **Entrega del proyecto personal**  
-- Martes 23: 
-  - Complejidad computacional. 
-  - Algoritmos de ordenamiento. 
-  - **Taller por la tarde:** Revisión de propuestas para proyecto grupal. 
-- Miércoles 24: 
-  - Examen corto: Creación y manejo de objetos.  
   - NumPy
   - matplotlib
+  - **Entrega del proyecto personal**  
+- Martes 23: 
+  - Programación orientada a objetos. 
+  - Herencia.
+  - **Taller por la tarde:** Revisión de propuestas para proyecto grupal. 
+  - **Entrega de tarea 3**. 
+- Miércoles 24: 
+  - Complejidad computacional. 
+  - Pandas
   - **Taller por la tarde:** Publicación de reportes con Quarto. 
 - Jueves 25:
-  - Pandas
-  - Libre: e.g. statsmodels
+  - *Algoritmos de ordenamiento*. 
+  - *Libre: e.g. statsmodels*
+  - **Entrega de tarea 4**. 
   - **Taller por la tarde:** Tutorías para el proyecto. 
 - Viernes 26: 
+  - Examen corto: Creación y manejo de objetos.  
   - **Presentaciones de proyectos grupales**. 
   - **Taller por la tarde:** Inmersión de cervezas artesanales. 
