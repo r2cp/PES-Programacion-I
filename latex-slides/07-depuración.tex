@@ -1,0 +1,566 @@
+%-----------------------------------------------------------------
+% Rodrigo Chang, 2019
+% Banco de Guatemala
+% Programa de Estudios Superiores 2019-2020
+% Diapositivas del curso "Programación I"
+%
+% Descargo de responsabilidad.
+%   El contenido de este documento es responsabilidad exclusiva de
+% su(s) autores. Cualquier opinión expresada no necesariamente
+% representa la postura institucional del Banco de Guatemala. 
+% 
+% Contenido.
+%   El contenido de estas diapositivas está construido a partir de 
+% modificaciones al material provisto por Ana Bell, Eric Grimson y 
+% John Guttag para el curso 6.0001 Introduction to Computer Science 
+% and Programming in Python, otoño 2016, Massachusetts Institute of 
+% Technology: MIT OpenCourseWare, https://ocw.mit.edu
+%
+% Licencia: 
+% Creative Commons BY-NC-SA
+% https://creativecommons.org/licenses/by-nc-sa/4.0/.
+%
+% Formato. 
+%   El formato utilizado para la elaboración de este documento 
+% ha sido modificado a partir del repositorio: 
+%       https://github.com/rinnert/statlearning-python-pwf
+%
+% Kurt Rinnert, 2019
+%   Copying and distribution of this file, with or without 
+% modification, are permitted in any medium without royalty provided 
+% the copyright notice and this notice are preserved. This file is 
+% offered as-is, without any warranty.
+%
+%-----------------------------------------------------------------
+\documentclass[mathserif]{beamer}
+% Para configurar las diapositivas en relación 16:9, 
+% agregar la opción aspectratio=169
+
+% Título de la presentación y tópicos a tratar
+\input{preamble}
+\subtitle{%
+  \bfseries{Pruebas, depuración y manejo de excepciones}\\%
+  %{\tiny\it Manejo de strings, \textit{guess and check}, métodos de aproximación}\\%
+}
+
+% Inicio del documento
+\begin{document}
+\input{common}
+%-----------------------------------------------------------------
+% Empieza el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{frame}{Abstract}
+	\Quote{Always code as if the guy who ends up maintaining your code will be a violent psychopath who knows where you live.}{John Woods}
+	
+	% Commenting your code is like cleaning your bathroom — you never want to do it, but it really does create a more pleasant experience for you and your guests. - Ryan Campbell
+    
+	\begin{blurb}
+		Veremos algunos conceptos y buenas prácticas para realizar pruebas y depuración.
+		
+		Veremos algunas sentencias de {\blue excepción} y manejo de errores.
+		
+	\end{blurb}
+\end{frame}
+
+\section{Depuración y pruebas}
+
+\begin{frame}[fragile]{Alta calidad: una analogía}
+\vspace{0.5cm}
+Supongamos que queremos hacer una sopa, pero algunos {\blue\bfseries insectos} caen del techo. ¿Qué harías?
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            \begin{itemize}
+                \item Revisar la sopa a ver si hay bichos.
+                \begin{itemize}
+                    \item Pruebas.
+                \end{itemize}
+                \item Mantener la tapa cerrada.
+                \begin{itemize}
+                    \item Programación defensiva.
+                \end{itemize}
+                \item Limpiar la cocina.
+                \begin{itemize}
+                    \item Eliminamos la fuente de los bichos.
+                \end{itemize}
+                \end{itemize}
+            \end{column}
+        \begin{column}{0.6\textwidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.98\textwidth]{figs/depuracion/debugging.jpg}
+        \end{figure}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item {\blue\bfseries Programación defensiva}
+        \begin{itemize}
+            \item Escribir {\orange especificaciones} para las funciones.
+            \item {\orange Modularizar} los programas.
+            \item Revisar {\orange condiciones} sobre entradas y salidas (\textit{assertions}).
+        \end{itemize}
+        
+        \item {\blue\bfseries Validación y pruebas}
+        \begin{itemize}
+            \item {\orange Comparar} pares de entradas y salidas para verificar las especificaciones.
+            \item ¡No está funcionando!
+            \item Pensar: ¿cómo puedo hacer que falle mi programa?
+        \end{itemize}
+        
+        \item {\blue\bfseries Depuración (\textit{debugging})}
+        \begin{itemize}
+            \item {\orange Estudiar eventos} que han llevado a errores.
+            \item Pensar: ¿por qué no está funcionando?
+            \item ¿Cómo puedo arreglar mi programa?
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Set up for easy testing
+\begin{frame}[fragile]{Programación defensiva}
+    \begin{itemize}
+        \item Desde el {\orange\bfseries principio}, {\blue\bfseries diseñar} el código para facilitar esta parte.
+        
+        \item Diseñar el programa en {\blue módulos} que puedan ser probados y depurados individualmente.
+        
+        \item {\blue\bfseries Documentar las restricciones} sobre módulos:
+        \begin{itemize}
+            \item ¿Cuál se espera que sea la entrada?
+            \item ¿Cuál se espera que sea la salida?
+        \end{itemize}
+        
+        \item {\blue\bfseries Documentar supuestos} detrás del código.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{¿Cuándo se debe probar un código?}
+    \begin{itemize}
+        \item Asegurarse que el código {\blue\bfseries pueda ejecutarse}.
+        \begin{itemize}
+            \item Eliminar errores de sintaxis, semántica estática.
+            \item El intérprete de Python y los editores ayudan en esta tarea.
+        \end{itemize}
+        
+        \item Contar con un {\blue\bfseries conjunto de prueba}.
+        \begin{itemize}
+            \item Conjunto de entrada del cual conocemos la salida esperada.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Tipos de pruebas
+\begin{frame}[fragile]{Clases de pruebas}
+    \begin{itemize}
+        \item {\blue\bfseries Pruebas de unidad}
+        \begin{itemize}
+            \item Validar cada pieza de un programa.
+            \item {\orange Probar cada función} de forma separada.
+        \end{itemize}
+        
+        \item {\blue\bfseries Pruebas de regresión}
+        \begin{itemize}
+            \item Añadir casos de pruebas conforme se encuentran \textit{bugs}.
+            \item {\orange Validar} errores reintroducidos y previamente arreglados.
+        \end{itemize}
+        
+        \item {\blue\bfseries Pruebas de integración}
+        \begin{itemize}
+            \item ¿Cómo unir todo el programa?, ¿funciona en conjunto?
+            \item No se debe apresurar en este paso.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+% Tipos de pruebas
+\begin{frame}[fragile]{Tipos de pruebas}
+    \begin{itemize}
+        \item {\blue\bfseries Intuición} acerca de los límites del programa.
+\begin{lstlisting}
+def is_bigger(x, y):
+    ''' Assumes x and y are ints
+    Returns True if y is less than x, else False '''
+\end{lstlisting}
+        \begin{itemize}
+            \item ¿alguna partición natural para probar esta función?
+        \end{itemize}
+        
+        \item Si no hay particiones naturales $\Rightarrow$ {\blue pruebas aleatorias}.
+        \begin{itemize}
+            \item Más pruebas $\Rightarrow$ mayor prob. de éxito. 
+            \item Método no ideal.
+        \end{itemize}
+        
+        \item {\orange\bfseries Prueba de caja negra}
+        \begin{itemize}
+            \item Explorar casos a través de la especificación.
+        \end{itemize}
+        
+        \item {\orange\bfseries Prueba de caja de cristal}
+        \begin{itemize}
+            \item Explorar casos a través del conocimiento del código.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Pruebas de caja negra
+\begin{frame}[fragile]{Pruebas de caja negra}
+\begin{lstlisting}
+def sqrt(x, eps):
+    ''' Assumes x, eps floats, x >= 0, eps > 0
+    Returns res such that x-eps <= res*res <= x+eps '''
+\end{lstlisting}
+    \begin{itemize}
+        \item Diseñada {\orange sin conocimiento} del código.
+        \item Puede ser realizada por alguien distinto al programador.
+        \item Puede ser {\orange reutilizada} aún si la implementación cambia.
+        \item Algunos caminos:
+        \begin{itemize}
+            \item Casos de prueba en particiones naturales.
+            \item Considera {\orange condiciones límite}: listas vacías, listas \textit{singleton}, números muy grandes o muy pequeños, etc.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Black box testing example
+\includeslides{9}{slides-60001/MIT6_0001F16_Lec7_mod.pdf}{Pruebas de caja negra}
+
+% Pruebas de caja de cristal
+\begin{frame}[fragile]{Pruebas de caja de cristal}
+    \begin{itemize}
+        \item Utilizamos {\orange el código} para construir los casos de prueba.
+        \item Pueden ser {\orange completas} si se explora cada ramificación del código al menos una vez.
+        \item Desventajas:
+        \begin{itemize}
+            \item Muchas iteraciones.
+            \item Nos podemos saltar alguna rama.
+        \end{itemize}
+        
+        \item Guía para diseñarlas:
+        \begin{itemize}
+            \item Revisar condicionales: ¿están todos los posibles casos?
+            \item Revisar ciclos: ¿entra al ciclo?, ¿por qué se ejecuta una vez, o más de una vez?
+            \item Tipos de datos: ¿Devuelve el tipo esperado?, ¿se tuvo cuidado al operar las variables?
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Ejemplo de glass box testing
+\begin{frame}[fragile]{}
+\begin{lstlisting}
+def abs(x):
+    """ Assumes x is an int
+    Returns x if x>=0 and -x otherwise """
+    if x < -1:
+        return -x
+    else:
+        return x
+\end{lstlisting}
+    \begin{itemize}
+        \item Aún si la prueba es {\orange completa}, podríamos saltarnos un \textit{bug}.
+        \item ¿Qué pasa con los casos 2 y -2?
+        \item ¿Qué pasa con \lstinline|abs(-1)|?
+        \item Se deben probar casos {\orange\bfseries límite}.
+    \end{itemize}
+\end{frame}
+
+% Depuración
+\begin{frame}[fragile]{Depuración}
+    \begin{itemize}
+        \item Curva de aprendizaje pronunciada.
+        
+        \item La meta es tener un programa libre de errores.
+        
+        \item {\blue\bfseries Herramientas}
+        \begin{itemize}
+            \item {\blue\bfseries Cerebro}: ayuda a cazar {\blue sistemáticamente} el error.
+            \item Módulo \lstinline|pdb|.
+            \item Visual Studio Code, spyder.
+            \item Instrucciones \lstinline|print| (¡no abusar!)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Depuración con print
+\begin{frame}[fragile]{Depuración con \lstinline|print|}
+    \begin{itemize}
+        \item Buena forma de probar hipótesis.
+        
+        \item {\blue\bfseries ¿Cuándo?}
+        \begin{itemize}
+            \item Entrar a funciones.
+            \item Parámetros
+            \item Resultados intermedios, finales. 
+        \end{itemize}
+        
+        \item {\blue\bfseries Método de bisección}
+        \begin{itemize}
+            \item \lstinline|print| al centro del código.
+            \item Los errores dan una idea de {\blue dónde} puede estar el error.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.6\textwidth]{figs/depuracion/debugging-patrick-meme.jpg}
+    \end{figure}
+\end{frame}
+
+% Pasos de depuración
+\begin{frame}[fragile]{Pasos de depuración}
+    \begin{itemize}
+        \item {\orange\bfseries Estudiar} el código fuente:
+        \begin{itemize}
+            \item ¿Cómo obtuve el resultado inesperado?
+            \item ¿Es parte de alguna familia de erores?
+        \end{itemize}
+        
+        \item {\orange\bfseries Método científico}:
+        \begin{itemize}
+            \item Estudiar los datos disponibles.
+            \item Formar una hipótesis.
+            \item Experimento.
+            \item Escoger una entrada simple para probar.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Familias de errores
+\includeslides{15}{slides-60001/MIT6_0001F16_Lec7_mod.pdf}{Familias de errores}
+
+% Errores de lógica
+\includeslides{16}{slides-60001/MIT6_0001F16_Lec7_mod.pdf}{Errores de lógica : difíciles}
+
+% ¿Qué no hacer?, ¿qué sí?
+\includeslides{17}{slides-60001/MIT6_0001F16_Lec7_mod.pdf}{¿Qué no hacer?, ¿qué sí?}
+
+
+
+\section{Manejo de excepciones}
+
+% Excepciones
+\includeslides{18-19}{slides-60001/MIT6_0001F16_Lec7_mod.pdf}{Excepciones}
+
+% Manejo de excepciones
+\begin{frame}[fragile]{Manejo de excepciones}
+    \begin{itemize}
+        \item Python provee bloques de {\blue\bfseries manejo} de excepciones (exceptions).
+\begin{lstlisting}
+try:
+    a = int(input("Tell me one number:"))
+    b = int(input("Tell me another number:"))
+    print(a/b)
+except:
+    print("Bug in user input.")
+\end{lstlisting}
+
+        \item Las {\orange\bfseries excepciones} que surjan (\textit{raised by}) en el cuerpo de una sentencia \lstinline|try| son manejadas por el cuerpo de \lstinline|except| mientras {\blue la ejecución continúa}.
+    \end{itemize}
+\end{frame}
+
+% Excepciones específicas
+\begin{frame}[fragile]{Excepciones específicas}
+    \begin{itemize}
+        \item Es posible especificar cláusulas de \lstinline|except| para una excepción en particular. 
+\begin{lstlisting}
+try:
+    a = int(input("Tell me one number: "))
+    b = int(input("Tell me another number: "))
+    print("a/b = ", a/b)
+    print("a+b = ", a+b)
+except ValueError:
+    print("Could not convert to a number.")
+except ZeroDivisionError:
+    print("Can't divide by zero")
+except:
+    print("Something went very wrong.")
+\end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+% Más cláusulas
+\begin{frame}[fragile]{Otras excepciones}
+    \begin{itemize}
+        \item \lstinline|else|:
+        \begin{itemize}
+            \item Se ejecuta si la ejecución de \lstinline|try| {\orange se completa sin excepciones}.
+        \end{itemize}
+        
+        \item \lstinline|finally|:
+        \begin{itemize}
+            \item Se ejecuta {\orange\bfseries siempre} después de \lstinline|try|, \lstinline|else| y \lstinline|except| o si ejecuta \lstinline|break|, \lstinline|continue| o \lstinline|return|.
+            
+            \item {\orange\bfseries Útil} para limpiar el código con instrucciones que de todas formas deben ejecutarse sin importar el resultado, como cerrar un archivo, conexión HTTP, etc.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% ¿Qué hacer con las excepciones?
+\begin{frame}[fragile]{¿Qué hacer con las excepciones?}
+    \begin{itemize}
+        \item {\blue\bfseries Manejarlas silenciosamente}
+        \begin{itemize}
+            \item Sustituir valores por defecto, solamente continuar con el código.
+            \item ¡Mala idea! el usuario no tiene advertencias.
+        \end{itemize}
+        
+        \item Devolver un valor para {\blue\bfseries representar} el error. 
+        \begin{itemize}
+            \item ¿Qué valor escoger?
+            \item Complica el resto del código.
+        \end{itemize}
+        
+        \item Detener la ejecución, {\orange\bfseries mostrar una condición de error}:
+        \begin{itemize}
+            \item En Python: \lstinline|raise|
+        \end{itemize}
+\begin{lstlisting}
+raise Exception("string descriptivo")
+\end{lstlisting}
+    \end{itemize}
+\end{frame}
+
+% Exception example
+\begin{frame}[fragile]{Excepciones: ejemplo}
+\begin{lstlisting}
+def get_ratios(L1, L2):
+    """ Assumes: L1, L2 lists of equal length of numbers
+        Returns: a list containing L1[i]/L2[i] """
+    ratios = []
+    for index in range(len(L1)):
+        try:
+            ratios.append(L1[index]/L2[index])
+        except ZeroDivisionError:
+            ratios.append(float('nan'))
+            #nan = not a number
+        except:
+            raise ValueError('called with bad arg')
+    return ratios
+\end{lstlisting}
+\end{frame}
+
+%% Ejemplos adicionales de try-except
+\includeslides{26-30}{slides-60001/MIT6_0001F16_Lec7_mod.pdf}{Excepciones: otro ejemplo}
+
+
+\subsection{Assertions}
+
+\begin{frame}[fragile]{Uso de \lstinline|assert|}
+    \begin{itemize}
+        \item Cuando quieres estar {\blue\bfseries seguro} de que los supuestos del cómputo son como se esperaba.
+        
+        \item Utilizamos una cláusula \lstinline|assert| para generar una excepción \lstinline|AssertionError| si no se verifican los supuestos.
+        
+        \item Este es un ejemplo de buena {\blue\bfseries programación defensiva}.
+    \end{itemize}
+\end{frame}
+
+% Ejemplo de assert
+\begin{frame}[fragile]{Ejemplo}
+\begin{lstlisting}
+def avg(grades):
+    """ grades : grades list """
+    assert len(grades) != 0, 'no grades data'
+    return sum(grades)/len(grades)
+\end{lstlisting}
+
+    \begin{itemize}
+        \item Esto lleva a una excepción de tipo \lstinline|AssertionError| si se da una lista vacía de notas.
+        
+        \item De lo contrario, ¡OK!
+    \end{itemize}
+\end{frame}
+
+% Assertions como programación defensiva
+\begin{frame}[fragile]{\textit{Assertions} como programación defensiva}
+    \begin{itemize}
+        \item Las afirmaciones no permiten que el programador controle respuesta a condiciones inesperadas.
+        
+        \item Garantizan que la {\blue ejecución se detenga} siempre que condición no se cumple.
+        
+        \item Normalmente se usan para {\blue verificar las entradas} a las funciones, pero pueden ser usadas en cualquier lugar.
+        
+        \item Pueden usarse para {\blue verificar las salidas} de una función para evitar propagar malos valores.
+        
+        \item Pueden facilitar la depuración de un error.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{¿Dónde usarlas?}
+    \begin{itemize}
+        \item El objetivo es encontrar errores tan pronto como se introduzcan.
+        
+        \item {\blue\bfseries Suplemento} a la etapa de pruebas.
+        
+        \item Levantar {\blue\bfseries excepciones} si el usuario provee datos incorrectos.
+        
+        \item También permiten: 
+        \begin{itemize}
+            \item Verificar {\blue\bfseries tipos} de los argumentos o valores.
+            \item Revisar {\blue\bfseries anomalías} en las estructuras de datos.
+            \item Revisar {\blue\bfseries restricciones} en los valores de retorno.
+            \item Revisar {\blue\bfseries violaciones} en las restricciones de un procedimiento.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+%-----------------------------------------------------------------
+% Termina el contenido de la presentación
+%-----------------------------------------------------------------
+
+\begin{comment}
+
+% Slide with two columns, half and half
+\begin{frame}[fragile]{}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% Slide with bullets
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\end{frame}
+
+% Slide with bullets and subbullets
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item {\blue\bfseries A}
+        \begin{itemize}
+            \item a
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Slide with bullets and code
+\begin{frame}[fragile]{}
+    \begin{itemize}
+        \item 
+    \end{itemize}
+\begin{lstlisting}
+Code goes here
+\end{lstlisting}
+\end{frame}
+
+% Slides PDF
+\includeslides{54-57}{slides-60001/MIT6_0001F16_Lec6_mod.pdf}{Eficiencia: Fibonacci con diccionarios}
+
+% Pytutor
+\href{URL}{Ver en Python Tutor}
+
+
+\end{comment}
+
+\end{document}
